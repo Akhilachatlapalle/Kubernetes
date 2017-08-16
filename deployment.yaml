@@ -2,24 +2,24 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: sc1
+  name: sc
 spec:
   template:
     metadata:
      labels:
-        app: CSCF
+        app: Someapp
      annotations:
-        additional_networks: "omnet, intnet, signet"
-        network_args_omnet: ifname=omnet
-        network_args_intnet: ifname=intnet
-        network_args_signet: ifname=signet
+        additional_networks: "net1, net2, net3"
+        network_args_net1: ifname=eth1
+        network_args_net2: ifname=eth2
+        network_args_net3: ifname=eth3
         flavor: Something  
      spec:
       nodeSelector:
         hostname: "compute1"
       containers:
-       - name: sc1
-         image:  olofhagsand/mcast  
+       - name: sc
+         image: busybox  
         # args:
         #- sleep
         #- "1000000"    
@@ -39,17 +39,17 @@ spec:
             value: Something
          volumeMounts:
          - mountPath: /something
-           name: sc1_volume
+           name: sc_volume
          volumeMounts:
          - mountPath: /something
-           name: cscf_nfs
+           name: nfs
       volumes:
-      - name: sc1_volume
+      - name: sc_volume
         hostPath:
           path: /Something
-      - name: cscf_nfs
+      - name: nfs
           nfs:
-            server: 10.121.52.66
-            path: "/srv/cscf/cluster"
+            server: something
+            path: "/something"
 
      
