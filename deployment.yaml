@@ -1,0 +1,55 @@
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: sc1
+spec:
+  template:
+    metadata:
+     labels:
+        app: CSCF
+     annotations:
+        additional_networks: "omnet, intnet, signet"
+        network_args_omnet: ifname=omnet
+        network_args_intnet: ifname=intnet
+        network_args_signet: ifname=signet
+        flavor: Something  
+     spec:
+      nodeSelector:
+        hostname: "compute1"
+      containers:
+       - name: sc1
+         image:  olofhagsand/mcast  
+        # args:
+        #- sleep
+        #- "1000000"    
+        #command: ["/bin/sh"]
+        #args: ["-c", "while true; do echo Hello Kubernetes!; sleep 10000000000; done"]
+         #resources:
+          #requests:
+           #memory: 4Gi
+           #cpu: 2
+          #limits:
+           #memory: 4Gi
+           #cpu: 2  
+         env:
+          - name: env_var_name1
+            value: Something
+          - name: env_var_name2
+            value: Something
+         volumeMounts:
+         - mountPath: /something
+           name: sc1_volume
+         volumeMounts:
+         - mountPath: /something
+           name: cscf_nfs
+      volumes:
+      - name: sc1_volume
+        hostPath:
+          path: /Something
+      - name: cscf_nfs
+          nfs:
+            server: 10.121.52.66
+            path: "/srv/cscf/cluster"
+
+     
