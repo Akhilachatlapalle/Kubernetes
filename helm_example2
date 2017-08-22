@@ -20,18 +20,18 @@ spec:
       containers:
        - name: sc
          image: busybox  
-        # args:
-        #- sleep
-        #- "1000000"    
-        #command: ["/bin/sh"]
-        #args: ["-c", "while true; do echo Hello Kubernetes!; sleep 10000000000; done"]
-         #resources:
-          #requests:
-           #memory: 4Gi
-           #cpu: 2
-          #limits:
-           #memory: 4Gi
-           #cpu: 2  
+         args:
+         - sleep
+         - "1000000"    
+         command: ["/bin/sh"]
+         args: ["-c", "while true; do echo Hello Kubernetes!; sleep 10000000000; done"]
+         resources:
+          requests:
+           memory: 4Gi
+           cpu: 2
+          limits:
+           memory: 4Gi
+           cpu: 2  
          env:
           - name: env_var_name1
             value: Something
