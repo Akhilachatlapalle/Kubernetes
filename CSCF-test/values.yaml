@@ -1,0 +1,70 @@
+# Default values for CSCF-HELM.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+name: cscf
+appname: cscf
+replicacount: 0
+image:
+  repository_sc:  busybox
+  repository_pl:  busybox
+#olofhagsand/mcast
+  pullPolicy: IfNotPresent
+
+OM_IPv4_address: a
+OM_IPv6_address: b
+OM_subnet_IPv4_address: c 
+OM_subnet_IPv6_address: d
+OM_gateway_IPv4_address: e
+OM_gateway_IPv6_address: f
+SC_1_IPv4_address: g
+SC_1_IPv6_address: h
+SC_2_IPv4_address: i
+SC_2_IPv6_address: j
+NTP_server_1_address: k
+NTP_server_2_address: l
+DNS_server_1_address: m
+DNS_server_2_address: n
+time_zone: o
+SC_1_eth0_mac_address: p
+SC_1_eth1_mac_address: q
+SC_1_eth2_mac_address: r
+SC_2_eth1_mac_address: s
+PL_3_eth0_mac_address: t
+PL_3_eth1_mac_address: u
+PL_3_eth2_mac_address: v
+PL_4_eth0_mac_address: w
+PL_4_eth1_mac_address: x
+PL_4_eth2_mac_address: y
+icscf_vip4: z
+icscf_vip6: a
+pcscf_vip4: b
+pcscf_vip6: c
+scscf_vip4: d 
+scscf_vip6: e
+ecscf_vip6: f
+ecscf_vip4: g 
+diarx_vip6: h
+diarx_vip4: i
+diarf_vip4: j
+diarf_vip6: k
+diaro_vip6: l
+diacx_vip6: m
+diaro_vip4: n
+diacx_vip4: o
+network:
+  OM_net_name: omnet
+  nw_internal: intnet
+  sig_net_name: signet
+  chr_net_name: chrnet
+Flavor:
+  SC_vCPUs: 4
+  SC_vRAM: 1Gi
+  PL_vCPUs: 8
+  PL_vRAM: 16Gi
+  limits:
+   SC_vCPUs: 2
+   SC_vRAM: 6Gi
+   PL_vCPUs: 8
+   PL_vRAM: 16Gi
+
+   

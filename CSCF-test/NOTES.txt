@@ -1,0 +1,2 @@
+1. Happy Helming!
+You could find all deployments of this template with same app name written as appname in values! 

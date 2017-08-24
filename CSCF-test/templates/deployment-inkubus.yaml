@@ -1,0 +1,302 @@
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: {{ .Values.name  }}-sc1
+  labels:
+{{ include "app" . | indent 4 }}
+{{ include "chart" . | indent 4 }}
+spec:
+  template:
+    metadata:
+     labels:
+      {{ include "app" . | indent 2 }}
+        release: {{ .Release.Name }}  
+     annotations:
+        additional_networks: "{{ .Values.network.nw_internal }},{{ .Values.network.OM_net_name }} "
+        network_args_{{ .Values.network.nw_internal }}: ifname={{ .Values.network.nw_internal }}
+        network_args_{{ .Values.network.OM_net_name  }}: ifname={{ .Values.network.OM_net_name  }}
+    spec:
+     containers:
+      - name: {{ .Values.name  }}-sc1
+        image: {{ .Values.image.repository_sc }}    
+        args:
+         - sleep
+         - "1000000"  
+        resources:
+         requests:
+          memory: {{ .Values.Flavor.SC_vRAM | quote }}
+          cpu: {{ .Values.Flavor.SC_vCPUs | quote }}
+         limits:
+          memory: {{ .Values.Flavor.limits.SC_vRAM | quote }}
+          cpu: {{ .Values.Flavor.limits.SC_vCPUs | quote }}
+
+        volumeMounts:
+        - mountPath: /cache
+          name: cachevolume
+        env: 
+        - name: ovf_env
+          value: |-
+              <Environment xmlns="http://schemas.dmtf.org/ovf/envelope/1"  xmlns:ovfenv="http://schemas.dmtf.org/ovf/environment/1"  ovfenv:id="VMID">
+              <PropertySection>
+              <Property ovfenv:key="OM_IPv4_address" ovfenv:value={{ .Values.OM_IPv4_address }}"/>
+              <Property ovfenv:key="OM_IPv6_address" ovfenv:value={{ .Values.OM_IPv6_address }}"/>
+              <Property ovfenv:key="OM_subnet_IPv4_address" ovfenv:value={{ .Values.OM_subnet_IPv4_address }}"/>
+              <Property ovfenv:key="OM_subnet_IPv6_address" ovfenv:value={{ .Values.OM_subnet_IPv6_address }}"/>
+              <Property ovfenv:key="OM_gateway_IPv4_address" ovfenv:value={{ .Values.OM_gateway_IPv4_address }}"/>
+              <Property ovfenv:key="OM_gateway_IPv6_address" ovfenv:value={{ .Values.OM_gateway_IPv6_address }}"/>
+              <Property ovfenv:key="SC-1_IPv4_address" ovfenv:value={{ .Values.SC_1_IPv4_address }}"/>
+              <Property ovfenv:key="SC-1_IPv6_address" ovfenv:value={{ .Values.SC_1_IPv6_address }}"/>
+              <Property ovfenv:key="SC-2_IPv4_address" ovfenv:value={{ .Values.SC_2_IPv4_address }}"/>
+              <Property ovfenv:key="SC-2_IPv6_address" ovfenv:value={{ .Values.SC_2_IPv6_address }}"/>
+              <Property ovfenv:key="NTP_server_1_address" ovfenv:value={{ .Values.NTP_server_1_address }} "/>
+              <Property ovfenv:key="NTP_server_2_address" ovfenv:value={{ .Values.NTP_server_2_address }}"/>
+              <Property ovfenv:key="DNS_server_1_address" ovfenv:value={{ .Values.DNS_server_1_address }}"/>
+              <Property ovfenv:key="DNS_server_2_address" ovfenv:value={{ .Values.DNS_server_2_address }}"/>
+              <Property ovfenv:key="time_zone" ovfenv:value={{ .Values.time_zone }}"/>
+              <Property ovfenv:key="SC-1_eth0_mac_address" ovfenv:value={{ .Values.SC_1_eth0_mac_address }}"/>
+              <Property ovfenv:key="SC-1_eth1_mac_address" ovfenv:value={{ .Values.SC_1_eth1_mac_address }}"/>
+              <Property ovfenv:key="SC-1_eth2_mac_address" ovfenv:value={{ .Values.SC_1_eth2_mac_address }}"/>
+              <Property ovfenv:key="SC-2_eth1_mac_address" ovfenv:value={{ .Values.SC_2_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth0_mac_address" ovfenv:value={{ .Values.PL_3_eth0_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth1_mac_address" ovfenv:value={{ .Values.PL_3_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth2_mac_address" ovfenv:value={{ .Values.PL_3_eth2_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth0_mac_address" ovfenv:value={{ .Values.PL_4_eth0_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth1_mac_address" ovfenv:value={{ .Values.PL_4_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth2_mac_address" ovfenv:value={{ .Values.PL_4_eth2_mac_address }}"/>
+              <Property ovfenv:key="icscf_vip4" ovfenv:value={{ .Values.icscf_vip4 }}"/>
+              <Property ovfenv:key="icscf_vip6" ovfenv:value={{ .Values.icscf_vip6 }}"/>
+              <Property ovfenv:key="pcscf_vip4" ovfenv:value={{ .Values.pcscf_vip4 }}"/>
+              <Property ovfenv:key="pcscf_vip6" ovfenv:value={{ .Values.pcscf_vip6 }}"/>
+              <Property ovfenv:key="scscf_vip4" ovfenv:value={{ .Values.scscf_vip4 }}"/>
+              <Property ovfenv:key="scscf_vip6" ovfenv:value={{ .Values.scscf_vip6 }}"/>
+              <Property ovfenv:key="ecscf_vip6" ovfenv:value={{ .Values.ecscf_vip6 }}"/>
+              <Property ovfenv:key="ecscf_vip4" ovfenv:value={{ .Values.ecscf_vip4 }}"/>
+              <Property ovfenv:key="diarx_vip6" ovfenv:value={{ .Values.diarx_vip6 }}"/>
+              <Property ovfenv:key="diarx_vip4" ovfenv:value={{ .Values.diarx_vip4 }}"/>
+              <Property ovfenv:key="diarf_vip4" ovfenv:value={{ .Values.diarf_vip4 }}"/>
+              <Property ovfenv:key="diarf_vip6" ovfenv:value={{ .Values.diarf_vip6 }}"/>
+              <Property ovfenv:key="diaro_vip6" ovfenv:value={{ .Values.diaro_vip6 }}"/>
+              <Property ovfenv:key="diacx_vip6" ovfenv:value={{ .Values.diacx_vip6 }}"/>
+              <Property ovfenv:key="diacx_vip4" ovfenv:value={{ .Values.diacx_vip4 }}"/>
+              <Property ovfenv:key="diaro_vip4" ovfenv:value={{ .Values.diaro_vip4 }}"/>
+              </PropertySection>  
+              </Environment>
+     volumes:
+      - name: cachevolume
+        emptyDir: {}     
+
+---
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: {{ .Values.name  }}-sc2
+  labels:
+{{ include "app" . | indent 4 }}
+{{ include "chart" . | indent 4 }}
+spec:
+  template:
+    metadata:
+     labels:
+      {{ include "app" . | indent 2 }}
+        release: {{ .Release.Name }}
+     annotations:
+        additional_networks: " {{ .Values.network.nw_internal }}, {{ .Values.network.OM_net_name }} "
+        network_args_{{ .Values.network.nw_internal }}: ifname={{ .Values.network.nw_internal }}
+        network_args_{{ .Values.network.OM_net_name  }}: ifname={{ .Values.network.OM_net_name  }}
+    spec:
+     containers:
+      - name: {{ .Values.name  }}-sc2
+        image: {{ .Values.image.repository_sc }}
+        args:
+         - sleep
+         - "1000000"
+        resources:
+         requests:
+          memory: {{ .Values.Flavor.SC_vRAM | quote }}
+          cpu: {{ .Values.Flavor.SC_vCPUs | quote }}
+         limits:
+          memory: {{ .Values.Flavor.limits.SC_vRAM | quote }}
+          cpu: {{ .Values.Flavor.limits.SC_vCPUs | quote }}
+
+        volumeMounts:
+        - mountPath: /cache
+          name: cachevolume
+        env: 
+        - name: ovf_env
+          value: |-
+              <Environment xmlns="http://schemas.dmtf.org/ovf/envelope/1"  xmlns:ovfenv="http://schemas.dmtf.org/ovf/environment/1"  ovfenv:id="VMID">
+              <PropertySection>
+              <Property ovfenv:key="OM_IPv4_address" ovfenv:value={{ .Values.OM_IPv4_address }}"/>
+              <Property ovfenv:key="OM_IPv6_address" ovfenv:value={{ .Values.OM_IPv6_address }}"/>
+              <Property ovfenv:key="OM_subnet_IPv4_address" ovfenv:value={{ .Values.OM_subnet_IPv4_address }}"/>
+              <Property ovfenv:key="OM_subnet_IPv6_address" ovfenv:value={{ .Values.OM_subnet_IPv6_address }}"/>
+              <Property ovfenv:key="OM_gateway_IPv4_address" ovfenv:value={{ .Values.OM_gateway_IPv4_address }}"/>
+              <Property ovfenv:key="OM_gateway_IPv6_address" ovfenv:value={{ .Values.OM_gateway_IPv6_address }}"/>
+              <Property ovfenv:key="SC-1_IPv4_address" ovfenv:value={{ .Values.SC_1_IPv4_address }}"/>
+              <Property ovfenv:key="SC-1_IPv6_address" ovfenv:value={{ .Values.SC_1_IPv6_address }}"/>
+              <Property ovfenv:key="SC-2_IPv4_address" ovfenv:value={{ .Values.SC_2_IPv4_address }}"/>
+              <Property ovfenv:key="SC-2_IPv6_address" ovfenv:value={{ .Values.SC_2_IPv6_address }}"/>
+              <Property ovfenv:key="NTP_server_1_address" ovfenv:value={{ .Values.NTP_server_1_address }} "/>
+              <Property ovfenv:key="NTP_server_2_address" ovfenv:value={{ .Values.NTP_server_2_address }}"/>
+              <Property ovfenv:key="DNS_server_1_address" ovfenv:value={{ .Values.DNS_server_1_address }}"/>
+              <Property ovfenv:key="DNS_server_2_address" ovfenv:value={{ .Values.DNS_server_2_address }}"/>
+              <Property ovfenv:key="time_zone" ovfenv:value={{ .Values.time_zone }}"/>
+              <Property ovfenv:key="SC-1_eth0_mac_address" ovfenv:value={{ .Values.SC_1_eth0_mac_address }}"/>
+              <Property ovfenv:key="SC-1_eth1_mac_address" ovfenv:value={{ .Values.SC_1_eth1_mac_address }}"/>
+              <Property ovfenv:key="SC-1_eth2_mac_address" ovfenv:value={{ .Values.SC_1_eth2_mac_address }}"/>
+              <Property ovfenv:key="SC-2_eth1_mac_address" ovfenv:value={{ .Values.SC_2_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth0_mac_address" ovfenv:value={{ .Values.PL_3_eth0_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth1_mac_address" ovfenv:value={{ .Values.PL_3_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-3_eth2_mac_address" ovfenv:value={{ .Values.PL_3_eth2_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth0_mac_address" ovfenv:value={{ .Values.PL_4_eth0_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth1_mac_address" ovfenv:value={{ .Values.PL_4_eth1_mac_address }}"/>
+              <Property ovfenv:key="PL-4_eth2_mac_address" ovfenv:value={{ .Values.PL_4_eth2_mac_address }}"/>
+              <Property ovfenv:key="icscf_vip4" ovfenv:value={{ .Values.icscf_vip4 }}"/>
+              <Property ovfenv:key="icscf_vip6" ovfenv:value={{ .Values.icscf_vip6 }}"/>
+              <Property ovfenv:key="pcscf_vip4" ovfenv:value={{ .Values.pcscf_vip4 }}"/>
+              <Property ovfenv:key="pcscf_vip6" ovfenv:value={{ .Values.pcscf_vip6 }}"/>
+              <Property ovfenv:key="scscf_vip4" ovfenv:value={{ .Values.scscf_vip4 }}"/>
+              <Property ovfenv:key="scscf_vip6" ovfenv:value={{ .Values.scscf_vip6 }}"/>
+              <Property ovfenv:key="ecscf_vip6" ovfenv:value={{ .Values.ecscf_vip6 }}"/>
+              <Property ovfenv:key="ecscf_vip4" ovfenv:value={{ .Values.ecscf_vip4 }}"/>
+              <Property ovfenv:key="diarx_vip6" ovfenv:value={{ .Values.diarx_vip6 }}"/>
+              <Property ovfenv:key="diarx_vip4" ovfenv:value={{ .Values.diarx_vip4 }}"/>
+              <Property ovfenv:key="diarf_vip4" ovfenv:value={{ .Values.diarf_vip4 }}"/>
+              <Property ovfenv:key="diarf_vip6" ovfenv:value={{ .Values.diarf_vip6 }}"/>
+              <Property ovfenv:key="diaro_vip6" ovfenv:value={{ .Values.diaro_vip6 }}"/>
+              <Property ovfenv:key="diacx_vip6" ovfenv:value={{ .Values.diacx_vip6 }}"/>
+              <Property ovfenv:key="diacx_vip4" ovfenv:value={{ .Values.diacx_vip4 }}"/>
+              <Property ovfenv:key="diaro_vip4" ovfenv:value={{ .Values.diaro_vip4 }}"/>
+              </PropertySection>  
+              </Environment>
+     volumes:
+      - name: cachevolume
+        emptyDir: {}     
+
+---
+
+apiVersion: v1
+kind:  ReplicationController
+metadata:
+  name: {{ .Values.name  }}-pl3
+  labels:
+{{ include "app" . | indent 4 }}
+{{ include "chart" . | indent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+      {{ include "app" . | indent 2 }}
+        release: {{ .Release.Name }} 
+      annotations:
+        additional_networks: "{{ .Values.network.nw_internal }},{{ .Values.network.chr_net_name }},{{ .Values.network.sig_net_name}}"
+        network_args_{{ .Values.network.nw_internal }}: ifname={{ .Values.network.nw_internal }}
+        network_args_{{ .Values.network.chr_net_name  }}: ifname={{ .Values.network.chr_net_name  }}
+        network_args_{{ .Values.network.sig_net_name}}: ifname={{ .Values.network.sig_net_name}}
+    spec:
+       containers:
+        - name: {{ .Values.name  }}-pl3
+          image: {{ .Values.image.repository_pl }}
+          args:
+          - sleep
+          - "1000000"
+          resources:
+           requests:
+            memory: {{ .Values.Flavor.PL_vRAM | quote }}
+            cpu: {{ .Values.Flavor.PL_vCPUs | quote }}
+           limits:
+            memory: {{ .Values.Flavor.limits.PL_vRAM | quote }}
+            cpu: {{ .Values.Flavor.limits.PL_vCPUs | quote }}
+
+          env:
+          - name: ovf_env
+            value: |-
+              <Environment xmlns="http://schemas.dmtf.org/ovf/envelope/1" xmlns:oe="http://schemas.dmtf.org/ovf/environment/1"ovfenv:id="$VMID">
+              <PropertySection>
+              <PropertySection/>
+              </Environment>   
+
+---
+
+apiVersion: v1
+kind:  ReplicationController
+metadata:
+  name: {{ .Values.name  }}-pl4
+  labels:
+{{ include "app" . | indent 4 }}
+{{ include "chart" . | indent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+      {{ include "app" . | indent 2 }}
+        release: {{ .Release.Name }} 
+      annotations:
+        additional_networks: "{{ .Values.network.nw_internal }},{{ .Values.network.chr_net_name }},{{ .Values.network.sig_net_name}}"
+        network_args_{{ .Values.network.nw_internal }}: ifname={{ .Values.network.nw_internal }}
+        network_args_{{ .Values.network.chr_net_name  }}: ifname={{ .Values.network.chr_net_name  }}
+        network_args_{{ .Values.network.sig_net_name}}: ifname={{ .Values.network.sig_net_name}}
+    spec:
+       containers:
+        - name: {{ .Values.name  }}-pl4
+          image: {{ .Values.image.repository_pl }}
+          args:
+          - sleep
+          - "1000000"
+          resources:
+           requests:
+             memory: {{ .Values.Flavor.PL_vRAM | quote }}
+             cpu: {{ .Values.Flavor.PL_vCPUs | quote }}
+           limits:
+             memory: {{ .Values.Flavor.limits.PL_vRAM | quote }}
+             cpu: {{ .Values.Flavor.limits.PL_vCPUs | quote }}
+
+          env:
+          - name: ovf_env
+            value: |-
+              <Environment xmlns="http://schemas.dmtf.org/ovf/envelope/1" xmlns:oe="http://schemas.dmtf.org/ovf/environment/1"ovfenv:id="$VMID">
+              <PropertySection>
+              <PropertySection/>
+              </Environment>   
+
+---
+
+apiVersion: v1
+kind:  ReplicationController
+metadata:
+  name: {{ .Values.name  }}-plx
+  labels:
+{{ include "app" . | indent 4 }}
+{{ include "chart" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicacount  }}
+  template:
+    metadata:
+      labels:
+      {{ include "app" . | indent 2 }}
+        release: {{ .Release.Name }} 
+      annotations:
+        additional_networks: "{{ .Values.network.nw_internal }},{{ .Values.network.chr_net_name }},{{ .Values.network.sig_net_name}}"
+        network_args_{{ .Values.network.nw_internal }}: ifname={{ .Values.network.nw_internal }}
+        network_args_{{ .Values.network.chr_net_name  }}: ifname={{ .Values.network.chr_net_name  }}
+        network_args_{{ .Values.network.sig_net_name }}: ifname={{ .Values.network.sig_net_name }}
+    spec:
+       containers:
+        - name: {{ .Values.name  }}-plx
+          image: {{ .Values.image.repository_pl }}
+          args:
+          - sleep
+          - "1000000"
+          resources:
+           requests:
+             memory: {{ .Values.Flavor.PL_vRAM | quote }}
+             cpu: {{ .Values.Flavor.PL_vCPUs | quote }}
+           limits:
+             memory: {{ .Values.Flavor.limits.PL_vRAM | quote }}
+             cpu: {{ .Values.Flavor.limits.PL_vCPUs | quote }}
+
+
+
+
